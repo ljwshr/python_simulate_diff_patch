@@ -1,17 +1,15 @@
 import os
-from _overlapped import NULL
 
-#rootdir = 'D:\\t\\Fire_Safety_Guide'
-
-
+"""
+INPUT:path string, such as "D:\\t\\Fire_Safety_Guide"
+Return Value:string list,contains the all files's absolute path
+"""
 def scan_all_directories_and_files(root_path='D:\\t\\Fire_Safety_Guide'):
-    root_path_list = os.listdir(root_path)
     return_list=[]#store the file path
     #print(isinstance(root_path_list, list))
     for absolute_path in os.walk(root_path):
-        print(absolute_path)
+        #print(absolute_path)
         
-        path_to_directory = absolute_path[0]#get the first path
         file_list_in_path_to_directory = absolute_path[2]
         the_num_of_files = len(file_list_in_path_to_directory)
         
@@ -23,4 +21,5 @@ def scan_all_directories_and_files(root_path='D:\\t\\Fire_Safety_Guide'):
 
 My_list=[]          
 My_list = scan_all_directories_and_files()
-print(My_list)
+# print(My_list)
+print(My_list.__len__())
