@@ -23,7 +23,7 @@ def split_head_tail(absolte_path_of_file,the_root_path):
 INPUT:path string, such as "D:\\t\\Fire_Safety_Guide"
 Return Value:string list,contains the all files's absolute path
 """
-def scan_all_directories_and_files(root_path='D:\\t\\Fire_Safety_Guide'):
+def scan_all_directories_and_files(root_path):
     return_list=[]#store the file path
     #print(isinstance(root_path_list, list))
     for absolute_path in os.walk(root_path):
