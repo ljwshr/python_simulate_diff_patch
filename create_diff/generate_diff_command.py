@@ -87,61 +87,69 @@ def scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirec
     for i in range(0,user_files_list_len):
         user_file_path_temp = user_files_list[i]
         orig_file_path_temp = origCopy_files_list[i]
+
+        
+#this is begin of new method    
+        temp_diff_string ="diff "+user_file_path_temp+" "+orig_file_path_temp
+        print(temp_diff_string)
+        result_of_command  = subprocess.Popen(temp_diff_string, shell=True, stdout=subprocess.PIPE)
+        result_of_command.wait()# we must wait for the returncode result(0 or 1), otherwise, we will get None
+        print(result_of_command.returncode)
+        if result_of_command.returncode == 1:
+            print("OK,you should create a file")
+            temp_diff_string +=" > "
+            #the begin: just copy the codes from the old version
+            half_path = split_head_tail(user_file_path_temp,sourceRootLevelDirectory)
+     
+            new_file_path = patchDirectory + half_path+".diff"
+            #before execute this command,we should make this directory
+            index_of_split = new_file_path.rfind('\\')
+            the_path_that_will_create = new_file_path[:index_of_split]
+     
+            create_a_directory_in_path(the_path_that_will_create)
+     
+            temp_diff_string +=new_file_path+"\n"
+            print(temp_diff_string)
+            public_long_string += temp_diff_string
+            print (subprocess.Popen(temp_diff_string, shell=True, stdout=subprocess.PIPE).stdout.read())     
+            temp_copy_string = "copy "+orig_file_path_temp+" "+the_path_that_will_create
+            print(temp_copy_string)
+            public_long_string += temp_copy_string
+            print (subprocess.Popen(temp_copy_string, shell=True, stdout=subprocess.PIPE).stdout.read())
+            #the end 
+  
+        else :
+            print("No, you should not create a file")
+
+        
+# this is the end of the new method.
+
+
+#this is the begin of old method (create all the diff files)
+
 #         print(user_file_path_temp)
 #         print(orig_file_path_temp)
-        temp_diff_string ="diff "+user_file_path_temp+" "+orig_file_path_temp+" > "
-        
-        half_path = split_head_tail(user_file_path_temp,sourceRootLevelDirectory)
-#         print(half_path)
-        new_file_path = patchDirectory + half_path+".diff"
-        #before execute this command,we should make this directory
-        index_of_split = new_file_path.rfind('\\')
-        the_path_that_will_create = new_file_path[:index_of_split]
-#        print(the_path_that_will_create)
-        create_a_directory_in_path(the_path_that_will_create)
-#         print(new_folder_file_path)
-        temp_diff_string +=new_file_path+"\n"
-        print(temp_diff_string)
-        public_long_string += temp_diff_string
-        print (subprocess.Popen(temp_diff_string, shell=True, stdout=subprocess.PIPE).stdout.read())
-        
-        temp_copy_string = "copy "+orig_file_path_temp+" "+the_path_that_will_create
-        print(temp_copy_string)
-        public_long_string += temp_copy_string
-        print (subprocess.Popen(temp_copy_string, shell=True, stdout=subprocess.PIPE).stdout.read())
+#         temp_diff_string ="diff "+user_file_path_temp+" "+orig_file_path_temp+" > "        
+#         half_path = split_head_tail(user_file_path_temp,sourceRootLevelDirectory)
+# 
+#         new_file_path = patchDirectory + half_path+".diff"
+#         #before execute this command,we should make this directory
+#         index_of_split = new_file_path.rfind('\\')
+#         the_path_that_will_create = new_file_path[:index_of_split]
+# 
+#         create_a_directory_in_path(the_path_that_will_create)
+# 
+#         temp_diff_string +=new_file_path+"\n"
+#         print(temp_diff_string)
+#         public_long_string += temp_diff_string
+#         print (subprocess.Popen(temp_diff_string, shell=True, stdout=subprocess.PIPE).stdout.read())     
+#         temp_copy_string = "copy "+orig_file_path_temp+" "+the_path_that_will_create
+#         print(temp_copy_string)
+#         public_long_string += temp_copy_string
+#         print (subprocess.Popen(temp_copy_string, shell=True, stdout=subprocess.PIPE).stdout.read())
     
-        
-            
-        
-        
-        
-  
-         
-        
-    
-#     directory_list = os.listdir(sourceRootLevelDirectory)# search the list
-#     temp_string1 = temp_string + sourceRootLevelDirectory +"\\" +directory_list[0]+" "
-#     temp_file1 = sourceRootLevelDirectory +"\\" +directory_list[0]+" "
-#     
-#     directory_list2 = os.listdir(origCopyDirectory)
-#     temp_string2 = origCopyDirectory+"\\" + directory_list2[0]
-# #    print(temp_string2)
-#     
-#     temp_string1 += temp_string2
-#     temp_string1 += " > "+"working\working.diff\n\n"
-#     temp_string1 +="copy origCopy\main.cpp working\n\n"
-#     temp_string1 +="echo end"
-#     print(temp_string1)
-    
-# run the command directly
-#     create_a_directory_in_path(patchDirectory)
-#     command_one = "diff D:\__project_data\diff_patch_directory\sourceRoot_modified\main.cpp D:\__project_data\diff_patch_directory\origCopy\main.cpp > D:\__project_data\diff_patch_directory\working\working.diff"
-#     print (subprocess.Popen(command_one, shell=True, stdout=subprocess.PIPE).stdout.read())
+#this is the end of old method        
 
-#     command_two = "copy "+temp_file1+" "+patchDirectory
-#     print(command_two)
-#     print (subprocess.Popen(command_two, shell=True, stdout=subprocess.PIPE).stdout.read())
-    
 
         
 scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirectory)
