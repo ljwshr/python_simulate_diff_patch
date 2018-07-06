@@ -1,15 +1,30 @@
 import os
 import subprocess
 from test.test_decimal import directory
-patchDirectory = "D:\\__project_data\\diff_patch_directory\\working\\"
-sourceRootLevelDirectory = "D:\__project_data\diff_patch_directory\sourceRoot_modified"
-origCopyDirectory="D:\__project_data\diff_patch_directory\origCopy"
-command_name = "command_generated_by_python"
-public_long_string=""
-create_directory_flag = True
+import datetime
+# patchDirectory = "D:\\__project_data\\diff_patch_directory\\working\\"
+# sourceRootLevelDirectory = "D:\__project_data\diff_patch_directory\sourceRoot_modified"
+# origCopyDirectory="D:\__project_data\diff_patch_directory\origCopy"
 
+patchDirectory = "D:\\__project_data\\diff_real_project\\working\\"
+sourceRootLevelDirectory = "D:\\__project_data\\diff_real_project\\git-AD18-UT-Tests3\\AD18-EN\\build\\venv"
+origCopyDirectory="D:\\__project_data\\diff_real_project\\git-AD18\\AD18-EN\\build\\venv"
+
+create_directory_flag = True
+global_store_string =""
+global_change_count=0
+
+def split_head(absolte_path_of_file,the_root_path):
+    if len(absolte_path_of_file) > len(the_root_path):
+        start_number =len(the_root_path)
+        new_path = absolte_path_of_file[start_number:]
+        return new_path
+    else:
+        print("the path is not right when split the path!!!!")
+    return -1
 
 def split_head_tail(absolte_path_of_file,the_root_path):
+    global global_store_string
     if len(absolte_path_of_file) > len(the_root_path):
         #end_number=absolte_path_of_file.rfind('\\')
         start_number =len(the_root_path)+1
@@ -17,7 +32,19 @@ def split_head_tail(absolte_path_of_file,the_root_path):
         return new_path_will_created
     else:
         print("the path is not right when split the path!!!!")
+        global_store_string +="the path is not right when split the path!!!!"
     return ""
+
+def generate_time_string():
+    temp_my_time = datetime.datetime.now()
+    result_date=""
+    result_date+= str(temp_my_time.year)
+    result_date+=str(temp_my_time.month)
+    result_date+=str(temp_my_time.day)
+    result_date+=str(temp_my_time.hour)
+    result_date+=str(temp_my_time.minute)
+    result_date+=str(temp_my_time.second)
+    return result_date
 
 """
 INPUT:path string, such as "D:\\t\\Fire_Safety_Guide"
@@ -71,87 +98,105 @@ Fucntion describe:
 
 """  
 def scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirectory):
+    global global_store_string
+    file_name_string = generate_time_string()+".txt"
+    file_record_process = open(file_name_string,'a+')
     """
     recurse the two Directory, and find the differenct
     """
-    global public_long_string
     user_files_list = scan_all_directories_and_files(sourceRootLevelDirectory)
     origCopy_files_list = scan_all_directories_and_files(origCopyDirectory)
     user_files_list_len = len(user_files_list)
-#    temp_string = str(user_files_list_len)
-    if len(user_files_list) != len(origCopy_files_list):
-        print("the number of the files in two Direcotory is not equal"+50*"!")
-        print("program exit")
-        return 1
+    print("user_files_list_len is: " + str(len(user_files_list)))
+    file_record_process.write("user_files_list_len is: " + str(len(user_files_list))+"\n")
+    print("origCopy_files_list_len is: " + str(len(origCopy_files_list)))
+    file_record_process.write("origCopy_files_list_len is: " + str(len(origCopy_files_list))+"\n")
+    """
+    These are pre-conditions:
+        1. the length should be larger than 0
+        2. the file number of the two diretory should be equal
+    """
+    if user_files_list_len == 0:
+        print("the user files len is 0, please check your path !!!!!!!!!!")
+        global_store_string +="the user files len is 0, please check your path !!!!!!!!!!"
+
+    # check the intersection
+    user_files_relative_path_list = []
+    origCopy_files_relative_path_list = []
+    # check if there is a space and split the ralative path list for further use
+    for i in range(0,len(user_files_list)):
+        if user_files_list[i].find(" ") != -1:#find the space
+            print("wrong")
+            return "the --> "+sourceRootLevelDirectory+" <-- contains space !!"
+        else :
+            split_head_result=split_head(user_files_list[i],sourceRootLevelDirectory)
+            if split_head_result != -1:
+                user_files_relative_path_list.append(split_head_result)
+            
+    for i in range(0,len(origCopy_files_list)):
+        if origCopy_files_list[i].find(" ") != -1:#find the space
+            print("wrong")
+            return "the --> "+origCopyDirectory+" <-- contains space !!"
+        else :
+            split_head_result=split_head(origCopy_files_list[i],origCopyDirectory)
+            if split_head_result != -1:
+                origCopy_files_relative_path_list.append(split_head_result)
     
-    for i in range(0,user_files_list_len):
-        user_file_path_temp = user_files_list[i]
-        orig_file_path_temp = origCopy_files_list[i]
+#     print(len(user_files_relative_path_list))
+#     print(len(origCopy_files_relative_path_list))
+    intersection_list=list(set(user_files_relative_path_list).intersection(set(origCopy_files_relative_path_list)))
+    print("the intersection(the file with the same name) file number is  "+str(len(intersection_list)))
+    file_record_process.write("the intersection(the file with the same name) file number is  "+str(len(intersection_list))+"\n")
+    differen_set_1 = list(set(user_files_relative_path_list).difference(set(origCopy_files_relative_path_list)))
+    print(len(differen_set_1))
+    differen_set_2 = list(set(origCopy_files_relative_path_list).difference(set(user_files_relative_path_list)))
+    print(len(differen_set_2))   
+
+    for i in range(0,len(intersection_list)):
+        user_file_path_temp = sourceRootLevelDirectory+intersection_list[i]
+        orig_file_path_temp = origCopyDirectory+intersection_list[i]
 
         
 #this is begin of new method    
         temp_diff_string ="diff "+user_file_path_temp+" "+orig_file_path_temp
-        print(temp_diff_string)
+        print(str(i)+" -->times "+temp_diff_string)
+        file_record_process.write(str(i)+" -->times "+temp_diff_string+"\n")
+        global_store_string +=temp_diff_string
         result_of_command  = subprocess.Popen(temp_diff_string, shell=True, stdout=subprocess.PIPE)
         result_of_command.wait()# we must wait for the returncode result(0 or 1), otherwise, we will get None
-        print(result_of_command.returncode)
+#        print(result_of_command.returncode)
         if result_of_command.returncode == 1:
             print("OK,you should create a file")
+            global global_change_count
+            global_change_count+=1
             temp_diff_string +=" > "
             #the begin: just copy the codes from the old version
             half_path = split_head_tail(user_file_path_temp,sourceRootLevelDirectory)
-     
+      
             new_file_path = patchDirectory + half_path+".diff"
             #before execute this command,we should make this directory
             index_of_split = new_file_path.rfind('\\')
             the_path_that_will_create = new_file_path[:index_of_split]
-     
+      
             create_a_directory_in_path(the_path_that_will_create)
-     
+      
             temp_diff_string +=new_file_path+"\n"
             print(temp_diff_string)
-            public_long_string += temp_diff_string
             print (subprocess.Popen(temp_diff_string, shell=True, stdout=subprocess.PIPE).stdout.read())     
             temp_copy_string = "copy "+orig_file_path_temp+" "+the_path_that_will_create
             print(temp_copy_string)
-            public_long_string += temp_copy_string
             print (subprocess.Popen(temp_copy_string, shell=True, stdout=subprocess.PIPE).stdout.read())
+            
             #the end 
   
-        else :
-            print("No, you should not create a file")
-
+    # start to store the information to the file
+    
+    file_record_process.write(str(global_change_count)+" files have differences "+"\n")
+    file_record_process.close
         
 # this is the end of the new method.
 
-
-#this is the begin of old method (create all the diff files)
-
-#         print(user_file_path_temp)
-#         print(orig_file_path_temp)
-#         temp_diff_string ="diff "+user_file_path_temp+" "+orig_file_path_temp+" > "        
-#         half_path = split_head_tail(user_file_path_temp,sourceRootLevelDirectory)
-# 
-#         new_file_path = patchDirectory + half_path+".diff"
-#         #before execute this command,we should make this directory
-#         index_of_split = new_file_path.rfind('\\')
-#         the_path_that_will_create = new_file_path[:index_of_split]
-# 
-#         create_a_directory_in_path(the_path_that_will_create)
-# 
-#         temp_diff_string +=new_file_path+"\n"
-#         print(temp_diff_string)
-#         public_long_string += temp_diff_string
-#         print (subprocess.Popen(temp_diff_string, shell=True, stdout=subprocess.PIPE).stdout.read())     
-#         temp_copy_string = "copy "+orig_file_path_temp+" "+the_path_that_will_create
-#         print(temp_copy_string)
-#         public_long_string += temp_copy_string
-#         print (subprocess.Popen(temp_copy_string, shell=True, stdout=subprocess.PIPE).stdout.read())
-    
-#this is the end of old method        
-
-
-        
+       
 scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirectory)
 
 
