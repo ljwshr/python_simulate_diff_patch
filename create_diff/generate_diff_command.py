@@ -2,13 +2,12 @@ import os
 import subprocess
 from test.test_decimal import directory
 import datetime
-# patchDirectory = "D:\\__project_data\\diff_patch_directory\\working\\"
-# sourceRootLevelDirectory = "D:\__project_data\diff_patch_directory\sourceRoot_modified"
-# origCopyDirectory="D:\__project_data\diff_patch_directory\origCopy"
+
 
 patchDirectory = "D:\\__project_data\\diff_real_project\\working\\"
-sourceRootLevelDirectory = "D:\\__project_data\\diff_real_project\\git-AD18-UT-Tests3\\AD18-EN\\build\\venv"
-origCopyDirectory="D:\\__project_data\\diff_real_project\\git-AD18\\AD18-EN\\build\\venv"
+sourceRootLevelDirectory = "D:\\__project_data\\diff_real_project\\git-AD18-UT-Tests3\\AD18-EN\\build"
+origCopyDirectory="D:\\__project_data\\diff_real_project\\git-AD18\\AD18-EN\\build"
+sourceFileSpecList=["h","cpp"]
 
 create_directory_flag = True
 global_store_string =""
@@ -97,9 +96,9 @@ Fucntion describe:
     3. execute the command, and store the differences in a new file.
 
 """  
-def scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirectory):
+def scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirectory,sourceFileSpecList):
     global global_store_string
-    file_name_string = generate_time_string()+".txt"
+    file_name_string = "process"+generate_time_string()+".txt"
     file_record_process = open(file_name_string,'a+')
     """
     recurse the two Directory, and find the differenct
@@ -126,21 +125,30 @@ def scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirec
     # check if there is a space and split the ralative path list for further use
     for i in range(0,len(user_files_list)):
         if user_files_list[i].find(" ") != -1:#find the space
-            print("wrong")
-            return "the --> "+sourceRootLevelDirectory+" <-- contains space !!"
+            file_record_process.write("warning: the path contain a space,the path will be skipped: "+user_files_list[i]+"\n")
         else :
-            split_head_result=split_head(user_files_list[i],sourceRootLevelDirectory)
-            if split_head_result != -1:
-                user_files_relative_path_list.append(split_head_result)
+            temp_extension_index = user_files_list[i].rfind('.')
+            temp_extension_of_file = user_files_list[i][temp_extension_index+1:]
+            for traverse_str in sourceFileSpecList:
+                if temp_extension_of_file == traverse_str:
+                    split_head_result=split_head(user_files_list[i],sourceRootLevelDirectory)
+                    if split_head_result != -1:
+                        user_files_relative_path_list.append(split_head_result)
+                    break
+            
             
     for i in range(0,len(origCopy_files_list)):
         if origCopy_files_list[i].find(" ") != -1:#find the space
-            print("wrong")
-            return "the --> "+origCopyDirectory+" <-- contains space !!"
+            file_record_process.write("warning: the path contain a space,the path will be skipped: "+origCopy_files_list[i]+"\n")
         else :
-            split_head_result=split_head(origCopy_files_list[i],origCopyDirectory)
-            if split_head_result != -1:
-                origCopy_files_relative_path_list.append(split_head_result)
+            temp_extension_index = origCopy_files_list[i].rfind('.')
+            temp_extension_of_file = origCopy_files_list[i][temp_extension_index+1:]
+            for traverse_str in sourceFileSpecList:
+                if temp_extension_of_file == traverse_str:
+                    split_head_result=split_head(origCopy_files_list[i],origCopyDirectory)
+                    if split_head_result != -1:
+                        origCopy_files_relative_path_list.append(split_head_result)
+                    break
     
 #     print(len(user_files_relative_path_list))
 #     print(len(origCopy_files_relative_path_list))
@@ -158,7 +166,7 @@ def scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirec
 
         
 #this is begin of new method    
-        temp_diff_string ="diff "+user_file_path_temp+" "+orig_file_path_temp
+        temp_diff_string ="diff "+orig_file_path_temp+" "+user_file_path_temp
         print(str(i)+" -->times "+temp_diff_string)
         file_record_process.write(str(i)+" -->times "+temp_diff_string+"\n")
         global_store_string +=temp_diff_string
@@ -185,19 +193,43 @@ def scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirec
             print (subprocess.Popen(temp_diff_string, shell=True, stdout=subprocess.PIPE).stdout.read())     
             temp_copy_string = "copy "+orig_file_path_temp+" "+the_path_that_will_create
             print(temp_copy_string)
-            print (subprocess.Popen(temp_copy_string, shell=True, stdout=subprocess.PIPE).stdout.read())
-            
+            print (subprocess.Popen(temp_copy_string, shell=True, stdout=subprocess.PIPE).stdout.read())        
             #the end 
-  
     # start to store the information to the file
-    
     file_record_process.write(str(global_change_count)+" files have differences "+"\n")
-    file_record_process.close
-        
+    file_record_process.close       
 # this is the end of the new method.
+def test_repeat_file(temp_Directory):
+    file_list =scan_all_directories_and_files(temp_Directory)
+    temp_list=[]
+    my_dict_temp ={}
+    repeat_files_list=[]
+    file_name_repeat = "repeat_files"+generate_time_string()+".txt"
+    file_record_process = open(file_name_repeat,'a+')
+    for i in range(0,len(file_list)):
+        temp_end = file_list[i].rfind('\\')
+        temp_list.append(file_list[i][temp_end+1:]) 
+        my_dict_temp[temp_list[i]]=i;
+    
+    for i in range(0,len(temp_list)):
+        for j in range(i+1,len(temp_list)):
+            if temp_list[i] == temp_list[j]:
+                repeat_files_list.append(file_list[i])
+                repeat_files_list.append(file_list[j])
+                file_record_process.write(file_list[i]+"\n")
+                file_record_process.write(file_list[j]+"\n")
+                break
+    file_record_process.close            
+    print("the repeat_files length is: "+ str(len(repeat_files_list)))
+    print("the list length is:  "+ str(len(file_list)))
+    print("the dict length is:  "+ str(len(my_dict_temp)))
+    print(repeat_files_list)
 
+
+test_repeat_file(sourceRootLevelDirectory)
+test_repeat_file(origCopyDirectory)
        
-scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirectory)
+scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirectory,sourceFileSpecList)
 
 
 

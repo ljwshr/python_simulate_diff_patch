@@ -1,10 +1,27 @@
 import os
 import subprocess
-sourceRootLevelDirectory = "D:\\__project_data\\apply_patch_directory\\origin"
-patchDirectory = "D:\\__project_data\\apply_patch_directory\\patchs"
-origCopyDirectory = "D:\\__project_data\\apply_patch_directory\\bakup"
+sourceRootLevelDirectory = "D:\\__project_data\\apply_patchs_real_project\\git-AD18\\AD18-EN\\build"
+patchDirectory = "D:\\__project_data\\apply_patchs_real_project\\patchs"
+origCopyDirectory = "D:\\__project_data\\apply_patchs_real_project\\backup"
 
 create_directory_flag = True
+
+import datetime
+from builtins import str
+
+
+def generate_time_string():
+    temp_my_time = datetime.datetime.now()
+    result_date=""
+    result_date+= str(temp_my_time.year)
+    result_date+=str(temp_my_time.month)
+    result_date+=str(temp_my_time.day)
+    result_date+=str(temp_my_time.hour)
+    result_date+=str(temp_my_time.minute)
+    result_date+=str(temp_my_time.second)
+    return result_date
+    
+
 """
 INPUT:path string, such as "D:\\t\\Fire_Safety_Guide"
 Return Value:string list,contains the all files's absolute path
@@ -53,6 +70,7 @@ def scanAndApplyPatches(sourceRootLevelDirectory, patchDirectory, origCopyDirect
     #scan the SourceRootLevelDirectory recursively and store the results in a list(bigger list).
     user_files_list = scan_all_directories_and_files(sourceRootLevelDirectory)
     user_files_list_len = len(user_files_list)
+    append_time_string = generate_time_string()
 
     #scan the patchDirectory, and store the results in a list(smaller list).
     patch_files_list = scan_all_directories_and_files(patchDirectory)
@@ -66,8 +84,9 @@ def scanAndApplyPatches(sourceRootLevelDirectory, patchDirectory, origCopyDirect
             temp_user_file_name = user_files_list[j][begin_of_file_name:]
             if patch_name_pure == temp_user_file_name:
                 # copy the origin file to the new directory
-                create_a_directory_in_path(origCopyDirectory)
-                temp_command_copy_string = "copy "+user_files_list[j]+" "+origCopyDirectory
+                
+                create_a_directory_in_path(origCopyDirectory+append_time_string)
+                temp_command_copy_string = "copy "+user_files_list[j]+" "+origCopyDirectory+append_time_string
 #                 print(temp_command_string)
                 print (subprocess.Popen(temp_command_copy_string, shell=True, stdout=subprocess.PIPE).stdout.read())
                 #generate the command string
