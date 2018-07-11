@@ -2,6 +2,7 @@ import os
 import subprocess
 from test.test_decimal import directory
 import datetime
+import sys
 
 
 patchDirectory = "D:\\__project_data\\diff_real_project\\working\\"
@@ -110,6 +111,7 @@ def scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirec
     file_record_process.write("user_files_list_len is: " + str(len(user_files_list))+"\n")
     print("origCopy_files_list_len is: " + str(len(origCopy_files_list)))
     file_record_process.write("origCopy_files_list_len is: " + str(len(origCopy_files_list))+"\n")
+
     """
     These are pre-conditions:
         1. the length should be larger than 0
@@ -226,10 +228,18 @@ def test_repeat_file(temp_Directory):
     print(repeat_files_list)
 
 
-test_repeat_file(sourceRootLevelDirectory)
-test_repeat_file(origCopyDirectory)
-       
-scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirectory,sourceFileSpecList)
+# def check_input_parameter(input_list):
+#   check_input_parameter(sys.argv)
+
+
+
+if __name__ == '__main__':
+    
+    test_repeat_file(sourceRootLevelDirectory)
+    test_repeat_file(origCopyDirectory)  
+    scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirectory,sourceFileSpecList)
+    
+    
 
 
 
