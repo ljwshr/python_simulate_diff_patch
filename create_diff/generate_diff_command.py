@@ -4,9 +4,8 @@ from test.test_decimal import directory
 import datetime
 import sys
 
-
-patchDirectory = "D:\\__project_data\\diff_real_project\\working\\"
 sourceRootLevelDirectory = "D:\\__project_data\\diff_real_project\\git-AD18-UT-Tests3\\AD18-EN\\build"
+patchDirectory = "D:\\__project_data\\diff_real_project\\working"
 origCopyDirectory="D:\\__project_data\\diff_real_project\\git-AD18\\AD18-EN\\build"
 sourceFileSpecList=["h","cpp"]
 
@@ -183,7 +182,7 @@ def scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirec
             #the begin: just copy the codes from the old version
             half_path = split_head_tail(user_file_path_temp,sourceRootLevelDirectory)
       
-            new_file_path = patchDirectory + half_path+".diff"
+            new_file_path = patchDirectory +"\\"+ half_path+".diff"
             #before execute this command,we should make this directory
             index_of_split = new_file_path.rfind('\\')
             the_path_that_will_create = new_file_path[:index_of_split]
