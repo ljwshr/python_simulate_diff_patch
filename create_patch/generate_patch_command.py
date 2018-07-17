@@ -7,7 +7,7 @@ origCopyDirectory = "D:\\__project_data\\apply_patchs_real_project\\backup"
 create_directory_flag = True
 
 import datetime
-from builtins import str
+
 
 
 def generate_time_string():
@@ -84,20 +84,14 @@ def scanAndApplyPatches(sourceRootLevelDirectory, patchDirectory, origCopyDirect
             temp_user_file_name = user_files_list[j][begin_of_file_name:]
             if patch_name_pure == temp_user_file_name:
                 # copy the origin file to the new directory
-                
                 create_a_directory_in_path(origCopyDirectory+append_time_string)
                 temp_command_copy_string = "copy "+user_files_list[j]+" "+origCopyDirectory+append_time_string
-#                 print(temp_command_string)
                 print (subprocess.Popen(temp_command_copy_string, shell=True, stdout=subprocess.PIPE).stdout.read())
-                #generate the command string
                 temp_command_patch_string = "patch "+user_files_list[j]+" "+patch_files_list[i]
                 print(temp_command_patch_string)
                 print (subprocess.Popen(temp_command_patch_string, shell=True, stdout=subprocess.PIPE).stdout.read())
-             
-#                 print("OK")
                 break
-#             else:
-#                 print("not ok")
+
                 
                 
 scanAndApplyPatches(sourceRootLevelDirectory,patchDirectory,origCopyDirectory)

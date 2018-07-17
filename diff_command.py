@@ -64,9 +64,9 @@ def scanAndCreatePatches(sourceRootLevelDirectory, patchDirectory, origCopyDirec
 def check_input_parameter(input_list):
     '''check the input parameter...'''
     if len(input_list) >=4 :
-        sourceRootLevelDirectory = input_list[1]
-        patchDirectory = input_list[2]
-        origCopyDirectory = input_list[3]
+        sourceRootLevelDirectory = handle_relative_path(input_list[1])
+        patchDirectory = handle_relative_path(input_list[2])
+        origCopyDirectory = handle_relative_path(input_list[3])
         sourceFileSpecList =[]
         for i in range(4,len(input_list)):
             sourceFileSpecList.append(input_list[i])
